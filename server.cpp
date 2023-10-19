@@ -46,7 +46,7 @@ void Webserver::init(){
       exit(EXIT_FAILURE);
     }
 
-    read(new_socket, buffer, 4096);
+    read(new_socket, buffer, 1024);
     printf("%s\n", buffer);
     std::string path = dir + getRequestPath(buffer);
     std::string body = loadFile(path);
@@ -85,6 +85,8 @@ std::string Webserver::getContentType(std::string path){
     return "text/css";
   else if(extension == "js")
     return "text/javascript";
+  else if(extension == "png")
+    return "image/png";
   else if(extension == "ico")
     return "image/x-icon";
   return "text/plain";
@@ -102,7 +104,7 @@ std::string Webserver::loadFile(std::string path){
 }
 
 std::string Webserver::getRequestPath(std::string buffer){
-
+  std::string path;
   int cnt = 0;
   for(size_t i = 0; i < buffer.length(); i++)
     if(buffer[i] == '\n')
@@ -110,5 +112,9 @@ std::string Webserver::getRequestPath(std::string buffer){
     else
       cnt++;
   
-  return buffer.substr(4, cnt-14);
+  path = buffer.substr(4, cnt-14);
+
+  if(path == "/")
+    return "/index.html";
+  return path;
 }

@@ -1,10 +1,14 @@
 # Simple Webserver
 
 ## ToDo
-- [ ] Serve Webpages
-- [ ] Locate/Request Ressource
-- [ ] Add Headers
+- [X] Serve Webpages
+- [X] Locate/Request Ressource
+- [X] Add Headers
 - [ ] Handle parallel requests
+- [ ] Security
+- [ ] Pipelining
+- [ ] TLS
+- [ ] Logging
 
 ## References
 

@@ -9,7 +9,7 @@ private:
   int server_fd;
   struct sockaddr_in address;
   int address_len = sizeof(address);
-  char buffer[4096];
+  char buffer[1024];
   std::string dir;
 
   std::string getRequestPath(std::string buffer);
