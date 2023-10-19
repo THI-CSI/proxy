@@ -1,4 +1,4 @@
-SRC = main.cpp webserver.cpp cli.cpp
+SRC = main.cpp Webserver/Webserver.cpp Webserver/WebserverCLI.cpp
 FLAGS = -g -Wall -std=c++20
 
 all: build

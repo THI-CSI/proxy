@@ -1,4 +1,4 @@
-#include "cli.h"
+#include "WebserverCLI.h"
 
 void WebserverCLI::print_help(std::string binary){
   std::cout << "usage: " << binary << " [--port port | --directory directory]" << std::endl << std::endl;

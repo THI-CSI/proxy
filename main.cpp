@@ -2,8 +2,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include "webserver.h"
-#include "cli.h"
+#include "Webserver/Webserver.h"
+#include "Webserver/WebserverCLI.h"
 
 int main (int argc, char *argv[]) {
   WebserverCLI cli(argc, argv);
