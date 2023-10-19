@@ -19,12 +19,6 @@ Webserver::Webserver(int port, std::string directory){
     exit(EXIT_FAILURE);
   }
 
-  int opt = 1;
-  if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))){
-    std::cerr << "[-] Socket configuration failed" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-
   if(bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0){
     std::cerr << "[-] Bind connection failed" << std::endl;
     exit(EXIT_FAILURE);
