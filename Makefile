@@ -8,4 +8,4 @@ build:
 	g++ $(FLAGS) $(SRC) -o bin/webserver
 
 clean:
-	rm bin -r
+	rm -rf bin 
