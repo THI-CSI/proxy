@@ -34,3 +34,5 @@ bin/
 
 # Miscellaneous
 shell.nix
+default.nix
+result/
