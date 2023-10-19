@@ -40,7 +40,12 @@ void Webserver::init(){
       exit(EXIT_FAILURE);
     }
 
-    read(new_socket, buffer, 1024);
+    int buffer_len = read(new_socket, buffer, 1024);
+    if(buffer_len == -1){
+      std::cerr << "[-] Could not read the request buffer" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
     printf("%s\n", buffer);
     std::string path = dir + getRequestPath(buffer);
     std::string body = loadFile(path);
