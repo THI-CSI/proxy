@@ -45,13 +45,13 @@ void Webserver::init(){
       std::cerr << "[-] Could not read the request buffer" << std::endl;
       exit(EXIT_FAILURE);
     }
-
-    printf("%s\n", buffer);
-    std::string path = dir + getRequestPath(buffer);
+    std::string request_path = getRequestPath(buffer);
+    std::string path = dir + request_path;
     std::string body = loadFile(path);
     std::string content_type = getContentType(path);
     std::string payload = getHeader(content_type, body.length(), 200) + body;
     send(new_socket, payload.c_str(), payload.length(), 0);
+    printf("[%d] %s\n", 200, request_path.c_str());
     close(new_socket);
   }
 }
@@ -63,11 +63,15 @@ Webserver::~Webserver(){
 
 
 std::string Webserver::getHeader(std::string content_type, int body_len, int status_code){
-  int length = body_len + 55 + content_type.length();
+  int length = body_len + 95 + content_type.length();
   std::string header = 
     "HTTP/1.1 " + std::to_string(status_code) + "\r\n"
     "Content-Type: "+ content_type + "\r\n"
-    "Content-Length: " + std::to_string(length) + "\r\n\r\n";
+    "Content-Length: " + std::to_string(length) + "\r\n"
+    "X-Frame-Options: DENY\r\n"
+    "X-XSS-Protection: 0\r\n"
+    "\r\n"
+    "\r\n\r\n";
   return header;
 }
 
