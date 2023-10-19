@@ -6,6 +6,8 @@
 #include <fstream>
 
 Webserver::Webserver(int port, std::string directory){
+  dir = directory;
+
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = INADDR_ANY;
   address.sin_port = htons(port);
@@ -44,10 +46,11 @@ void Webserver::init(){
       exit(EXIT_FAILURE);
     }
 
-    read(new_socket, buffer, 1024);
+    read(new_socket, buffer, 4096);
     printf("%s\n", buffer);
-    std::string body = "<h1>Hello World</h1>";
-    std::string content_type = getContentType("index.html");
+    std::string path = dir + getRequestPath(buffer);
+    std::string body = loadFile(path);
+    std::string content_type = getContentType(path);
     std::string payload = getHeader(content_type, body.length(), 200) + body;
     send(new_socket, payload.c_str(), payload.length(), 0);
     close(new_socket);
@@ -55,6 +58,7 @@ void Webserver::init(){
 }
 
 Webserver::~Webserver(){
+  std::cout << "[-] Shutdown Webserver" << std::endl << std::endl;;
   shutdown(server_fd, SHUT_RDWR);
 }
 
@@ -86,7 +90,25 @@ std::string Webserver::getContentType(std::string path){
   return "text/plain";
 }
 
-std::string loadFile(std::string path){
-  return "";
+std::string Webserver::loadFile(std::string path){
+  std::string content = "";
+  std::ifstream file;
+  file.open (path, std::ifstream::in);
+  if(file.good()){
+    content = std::string((std::istreambuf_iterator<char>(file) ), (std::istreambuf_iterator<char>()));
+  }
+  file.close();
+  return content;
 }
 
+std::string Webserver::getRequestPath(std::string buffer){
+
+  int cnt = 0;
+  for(size_t i = 0; i < buffer.length(); i++)
+    if(buffer[i] == '\n')
+      break;
+    else
+      cnt++;
+  
+  return buffer.substr(4, cnt-14);
+}
