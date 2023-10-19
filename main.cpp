@@ -9,6 +9,7 @@ int main (int argc, char *argv[]) {
   WebserverCLI cli(argc, argv);
   Webserver webserver(cli.getPort(), cli.getDirectory());
   printf("[+] Starting webserver on port '%d' in the directory '%s'.\n", cli.getPort(), cli.getDirectory().c_str());
+  printf("[!] Link: http://localhost:%d/", cli.getPort());
   webserver.init();
   return 0;
 }
