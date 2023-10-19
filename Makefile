@@ -1,5 +1,5 @@
 SRC = main.cpp server.cpp
-FLAGS = -g -Wall
+FLAGS = -g -Wall -std=c++20
 
 all: build
 
