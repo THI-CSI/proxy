@@ -44,8 +44,9 @@ void Webserver::init(){
 
     read(new_socket, buffer, 1024);
     printf("%s\n", buffer);
-    std::string msg = "Hello World";
-    send(new_socket, msg.c_str(), msg.length(), 0);
+    std::string body = "<h1>Hello World</h1>";
+    std::string payload = getHeader("text/html", body.length()) + body;
+    send(new_socket, payload.c_str(), payload.length(), 0);
     close(new_socket);
   }
 }
@@ -54,3 +55,12 @@ Webserver::~Webserver(){
   shutdown(server_fd, SHUT_RDWR);
 }
 
+
+std::string Webserver::getHeader(std::string content_type, int body_len){
+  int length = body_len + 55 + content_type.length();
+  std::string header = 
+    "HTTP/1.1\r\n"
+    "Content-Type: "+ content_type + "\r\n"
+    "Content-Length: " + std::to_string(length) + "\r\n\r\n";
+  return header;
+}
