@@ -1,7 +1,9 @@
 #include "server.h"
 #include <cstdlib>
 #include <iostream>
+#include <string>
 #include <sys/socket.h>
+#include <fstream>
 
 Webserver::Webserver(int port, std::string directory){
   address.sin_family = AF_INET;
@@ -45,7 +47,8 @@ void Webserver::init(){
     read(new_socket, buffer, 1024);
     printf("%s\n", buffer);
     std::string body = "<h1>Hello World</h1>";
-    std::string payload = getHeader("text/html", body.length()) + body;
+    std::string content_type = getContentType("index.html");
+    std::string payload = getHeader(content_type, body.length(), 200) + body;
     send(new_socket, payload.c_str(), payload.length(), 0);
     close(new_socket);
   }
@@ -56,11 +59,34 @@ Webserver::~Webserver(){
 }
 
 
-std::string Webserver::getHeader(std::string content_type, int body_len){
+std::string Webserver::getHeader(std::string content_type, int body_len, int status_code){
   int length = body_len + 55 + content_type.length();
   std::string header = 
-    "HTTP/1.1\r\n"
+    "HTTP/1.1 " + std::to_string(status_code) + "\r\n"
     "Content-Type: "+ content_type + "\r\n"
     "Content-Length: " + std::to_string(length) + "\r\n\r\n";
   return header;
 }
+
+std::string Webserver::getContentType(std::string path){
+  std::string extension = "";
+  size_t pos = path.find_last_of('.');
+  if (pos != std::string::npos) {
+    extension = path.substr(pos + 1);
+  }  
+
+  if(extension == "html")
+    return "text/html";
+  else if(extension == "css")
+    return "text/css";
+  else if(extension == "js")
+    return "text/javascript";
+  else if(extension == "ico")
+    return "image/x-icon";
+  return "text/plain";
+}
+
+std::string loadFile(std::string path){
+  return "";
+}
+
