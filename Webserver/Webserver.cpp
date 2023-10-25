@@ -1,6 +1,7 @@
 #include "Webserver.h"
 #include <cstdlib>
-#include <iostream>
+#include <exception>
+#include <iostream> 
 #include <string>
 #include <sys/socket.h>
 #include <fstream>
@@ -19,7 +20,8 @@ Webserver::Webserver(int port, std::string directory){
     exit(EXIT_FAILURE);
   }
 
-  if(bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0){
+  int socket_binding = bind(server_fd, (struct sockaddr*)&address, sizeof(address));
+  if(socket_binding < 0){
     std::cerr << "[-] Bind connection failed" << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -27,9 +29,10 @@ Webserver::Webserver(int port, std::string directory){
 }
 
 void Webserver::init(){
-  int new_socket;
+  int new_socket, socket_listener, buffer_len;
   while(true){
-    if(listen(server_fd, 3) < 0){
+    socket_listener = listen(server_fd, 3);
+    if(socket_listener < 0){
       std::cerr << "[-] Listen to port failed" << std::endl;
       exit(EXIT_FAILURE);
     }
@@ -40,18 +43,29 @@ void Webserver::init(){
       exit(EXIT_FAILURE);
     }
 
-    int buffer_len = read(new_socket, buffer, 1024);
+    buffer_len = read(new_socket, buffer, 1024);
     if(buffer_len == -1){
       std::cerr << "[-] Could not read the request buffer" << std::endl;
       exit(EXIT_FAILURE);
     }
+    
     std::string request_path = getRequestPath(buffer);
     std::string path = dir + request_path;
-    std::string body = loadFile(path);
-    std::string content_type = getContentType(path);
-    std::string payload = getHeader(content_type, body.length(), 200) + body;
+    std::string body, content_type;
+    int response_code;
+    try{
+      body = loadFile(path);
+      content_type = getContentType(path);
+      response_code = 200;
+    }catch(...){
+      body = "404 - Not found.";
+      content_type = "text/plain";
+      response_code = 404;
+    }
+    std::string payload = getHeader(content_type, body.length(), response_code) + body;
     send(new_socket, payload.c_str(), payload.length(), 0);
-    printf("[%d] %s\n", 200, request_path.c_str());
+    printf("Debug: [Path: %s] [Content-Type: %s]\n", path.c_str(), content_type.c_str());
+    printf("[%d] %s\n", response_code, request_path.c_str());
     close(new_socket);
   }
 }
@@ -63,15 +77,14 @@ Webserver::~Webserver(){
 
 
 std::string Webserver::getHeader(std::string content_type, int body_len, int status_code){
-  int length = body_len + 95 + content_type.length();
+  int length = body_len + 100 + content_type.length();
   std::string header = 
     "HTTP/1.1 " + std::to_string(status_code) + "\r\n"
     "Content-Type: "+ content_type + "\r\n"
     "Content-Length: " + std::to_string(length) + "\r\n"
     "X-Frame-Options: DENY\r\n"
     "X-XSS-Protection: 0\r\n"
-    "\r\n"
-    "\r\n\r\n";
+    "\r\n";
   return header;
 }
 
@@ -101,6 +114,8 @@ std::string Webserver::loadFile(std::string path){
   file.open (path, std::ifstream::in);
   if(file.good()){
     content = std::string((std::istreambuf_iterator<char>(file) ), (std::istreambuf_iterator<char>()));
+  }else{
+    throw std::exception();
   }
   file.close();
   return content;
