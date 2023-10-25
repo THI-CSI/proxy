@@ -36,3 +36,4 @@ bin/
 shell.nix
 default.nix
 result/
+.idea/
