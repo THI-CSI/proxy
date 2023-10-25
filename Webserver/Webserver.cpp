@@ -77,11 +77,9 @@ Webserver::~Webserver(){
 
 
 std::string Webserver::getHeader(std::string content_type, int body_len, int status_code){
-  int length = body_len + 100 + content_type.length();
   std::string header = 
     "HTTP/1.1 " + std::to_string(status_code) + "\r\n"
     "Content-Type: "+ content_type + "\r\n"
-    "Content-Length: " + std::to_string(length) + "\r\n"
     "X-Frame-Options: DENY\r\n"
     "X-XSS-Protection: 0\r\n"
     "\r\n";
