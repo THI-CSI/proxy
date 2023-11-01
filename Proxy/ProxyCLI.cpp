@@ -1,6 +1,6 @@
-#include "WebserverCLI.h"
+#include "ProxyCLI.h"
 
-void WebserverCLI::print_help(std::string binary){
+void ProxyCLI::print_help(std::string binary){
   std::cout << "usage: " << binary << " [--port port | --directory directory]" << std::endl << std::endl;
   std::cout << "  -h, --help         Show this help page" << std::endl;
   std::cout << "  -p, --port         Select the port" << std::endl;
@@ -8,7 +8,7 @@ void WebserverCLI::print_help(std::string binary){
   exit(-1);
 }
 
-WebserverCLI::WebserverCLI(int argc, char* argv[]){
+ProxyCLI::ProxyCLI(int argc, char* argv[]){
   if(argc <= 1){
     return;
   }
@@ -55,10 +55,10 @@ WebserverCLI::WebserverCLI(int argc, char* argv[]){
 }
 
 
-std::string WebserverCLI::getDirectory(){
+std::string ProxyCLI::getDirectory(){
   return this->dir;
 }
 
-int WebserverCLI::getPort(){
+int ProxyCLI::getPort(){
   return this->port;
 }
