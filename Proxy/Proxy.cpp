@@ -61,10 +61,10 @@ void Proxy::init(){
         break;
       case 1: {
           printf("[Host: %s] Blacklisted.\n", oldHost.c_str());
-          std::string forbiddenResponse = "HTTP/1.1 403 FORBIDDEN\r\nContent-Length: 0\r\n\r\n";
+          std::string forbiddenResponse = "HTTP/1.1 403 FORBIDDEN\r\nContent-Length: 30\r\n\r\nRequested Host is blacklisted!\r\n\r\n";
           send(new_socket, forbiddenResponse.c_str(), forbiddenResponse.length(), 0);
           close(new_socket);
-       }
+        }
         break;
       case 2:
         printf("[Host: %s] Redirected to %s.\n", oldHost.c_str(), host.c_str());
@@ -221,24 +221,19 @@ int Proxy::checkHost(std::string* host) {
 
 
 std::string Proxy::getHost(std::string buffer){
-  std::string hostHeader = "Host: ";
-  size_t hostPos = buffer.find(hostHeader);
+  size_t hostPosition = buffer.find("Host:");
 
-  if (hostPos == std::string::npos) {
-    // Host header not found
+  if (hostPosition != std::string::npos) {
+    size_t endOfHostLine = buffer.find("\r\n", hostPosition);
+
+    if (endOfHostLine != std::string::npos) {
+      // Extract the original Host line
+      std::string originalHostLine = buffer.substr(hostPosition + 6, endOfHostLine - hostPosition-6);
+      return originalHostLine;
+    }
     return "";
   }
-
-  hostPos += hostHeader.length();
-  size_t lineEndPos = buffer.find("\r\n", hostPos);
-
-  if (lineEndPos == std::string::npos) {
-    // Invalid HTTP request, missing CRLF
-    return "";
-  }
-
-  std::string hostValue = buffer.substr(hostPos, lineEndPos - hostPos);
-  return hostValue;
+  return "";
 }
 
 
